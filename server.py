@@ -2,8 +2,9 @@ import eventlet
 from app import app
 import socketio
 
-sio = socketio.Server()
+sio = socketio.Server(async_mode='threading')
 appServer = socketio.WSGIApp(sio, app)
+thread_pool = eventlet.GreenPool(6)
 
 @sio.event
 def connect(sid, environ):
@@ -18,4 +19,4 @@ def disconnect(sid):
     print('disconnect ', sid)
 
 if __name__ == '__main__':
-    eventlet.wsgi.server(eventlet.listen(('', 5000)), appServer)
+    eventlet.wsgi.server(eventlet.listen(('', 5000)), appServer, custom_pool=thread_pool)

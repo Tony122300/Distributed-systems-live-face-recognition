@@ -4,7 +4,7 @@ import face_recognition
 import numpy as np
 from flask_socketio import SocketIO
 from waitress import serve
-
+import threading
 app=Flask(__name__)
 socketioApp = SocketIO(app)
 camera = cv2.VideoCapture(0)
@@ -18,14 +18,19 @@ Kobe_face_encoding = face_recognition.face_encodings(Kobe_image)[0]
 bradley_image = face_recognition.load_image_file("Bradley/bradley.jpg")
 bradley_face_encoding = face_recognition.face_encodings(bradley_image)[0]
 
+Tony_image = face_recognition.load_image_file("Tony/Tony.jpg")
+Tony_face_encoding = face_recognition.face_encodings(Tony_image)[0]
+
 ##create list called know_face_encodings. can be used to compare to other face encodings
 known_face_encodings = [
     Kobe_face_encoding,
-    bradley_face_encoding
+    bradley_face_encoding,
+    Tony_face_encoding
 ]
 known_face_names = [
     "Kobe",
-    "Bradley"
+    "Bradley",
+    "Tony"
 ]
 #initialising variables
 face_locations = []
@@ -84,6 +89,8 @@ def gen_frames():
                 font = cv2.FONT_HERSHEY_DUPLEX
                 cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
+                thread = threading.Thread(target=gen_frames)
+                thread.start()
 
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
@@ -102,4 +109,4 @@ def run():
     socketioApp.run(app)
 
 if __name__ == '__main__':
-    serve(run, host='0.0.0.0', port=8080, url_scheme='RTMP', threads=6)
+     socketioApp.run(app)

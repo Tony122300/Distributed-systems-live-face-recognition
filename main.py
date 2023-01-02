@@ -14,14 +14,19 @@ Kobe_face_encoding = face_recognition.face_encodings(Kobe_image)[0]
 bradley_image = face_recognition.load_image_file("Bradley/bradley.jpg")
 bradley_face_encoding = face_recognition.face_encodings(bradley_image)[0]
 
+Tony_image = face_recognition.load_image_file("Tony/Tony.jpg")
+Tony_face_encoding = face_recognition.face_encodings(Tony_image)[0]
+
 ##create list called know_face_encodings. can be used to compare to other face encodings
 known_face_encodings = [
     Kobe_face_encoding,
-    bradley_face_encoding
+    bradley_face_encoding,
+    Tony_face_encoding
 ]
 known_face_names = [
     "Kobe",
-    "Bradley"
+    "Bradley",
+    "Tony"
 ]
 #initialising variables
 face_locations = []
