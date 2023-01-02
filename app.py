@@ -2,15 +2,17 @@ from flask import Flask,render_template,Response
 import cv2
 import face_recognition
 import numpy as np
+from flask_socketio import SocketIO
+from waitress import serve
 
 app=Flask(__name__)
+socketioApp = SocketIO(app)
 camera = cv2.VideoCapture(0)
-
 ##loads the image file from the path and returns representation of the image in memory as a Python object
 ##image can be used for facial recognition then
-Tony_image = face_recognition.load_image_file("Tony/Tony.jpg")
+Kobe_image = face_recognition.load_image_file("Kobe/kobe.jpg")
 ##generates a list of 128-dimensional encodings for the image
-Tony_face_encoding = face_recognition.face_encodings(Tony_image)[0]
+Kobe_face_encoding = face_recognition.face_encodings(Kobe_image)[0]
 
 ## second image of face for face recognition
 bradley_image = face_recognition.load_image_file("Bradley/bradley.jpg")
@@ -18,11 +20,11 @@ bradley_face_encoding = face_recognition.face_encodings(bradley_image)[0]
 
 ##create list called know_face_encodings. can be used to compare to other face encodings
 known_face_encodings = [
-    Tony_face_encoding,
+    Kobe_face_encoding,
     bradley_face_encoding
 ]
 known_face_names = [
-    "Tony",
+    "Kobe",
     "Bradley"
 ]
 #initialising variables
@@ -30,6 +32,9 @@ face_locations = []
 face_encodings = []
 face_names = []
 process_this_frame = True
+
+
+
 
 def gen_frames():  
     while True:
@@ -40,7 +45,10 @@ def gen_frames():
         else:
             # Resize frame of video to 1/4 size for faster face recognition processing
             small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
-
+    
+            fps = camera.get(cv2.CAP_PROP_FPS)
+            print("Frames per second:", fps)
+            
             # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
             rgb_small_frame = small_frame[:, :, ::-1]
 
@@ -81,7 +89,7 @@ def gen_frames():
             frame = buffer.tobytes()
             yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
+            
 
 @app.route('/')
 def index():
@@ -90,7 +98,8 @@ def index():
 @app.route('/video_feed')
 def video_feed():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+def run():
+    socketioApp.run(app)
 
-if __name__=='__main__':
-    app.run(debug=True)
-    
+if __name__ == '__main__':
+    serve(run, host='0.0.0.0', port=8080, url_scheme='RTMP', threads=6)

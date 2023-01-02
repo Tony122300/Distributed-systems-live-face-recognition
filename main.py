@@ -6,9 +6,9 @@ import numpy as np
 video_capture = cv2.VideoCapture(0)
 ##loads the image file from the path and returns representation of the image in memory as a Python object
 ##image can be used for facial recognition then
-Tony_image = face_recognition.load_image_file("Tony/Tony.jpg")
+Kobe_image = face_recognition.load_image_file("Kobe/kobe.jpg")
 ##generates a list of 128-dimensional encodings for the image
-Tony_face_encoding = face_recognition.face_encodings(Tony_image)[0]
+Kobe_face_encoding = face_recognition.face_encodings(Kobe_image)[0]
 
 ## second image of face for face recognition
 bradley_image = face_recognition.load_image_file("Bradley/bradley.jpg")
@@ -16,11 +16,11 @@ bradley_face_encoding = face_recognition.face_encodings(bradley_image)[0]
 
 ##create list called know_face_encodings. can be used to compare to other face encodings
 known_face_encodings = [
-    Tony_face_encoding,
+    Kobe_face_encoding,
     bradley_face_encoding
 ]
 known_face_names = [
-    "Tony",
+    "Kobe",
     "Bradley"
 ]
 #initialising variables
@@ -32,7 +32,6 @@ process_this_frame = True
 while True:
     # retrieves a frame from a video stream
     ret, frame = video_capture.read()
-
     # Resize frame of video to 1/4 size for faster face recognition processing
     small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
 
